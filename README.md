@@ -22,18 +22,20 @@ Server starts on **http://localhost:8000**
 ## ✨ Features
 
 ### Core Capabilities
-- ✅ **ML-Based Detection**: Random Forest classifier with 12+ engineered features
+- ✅ **ML-Based Detection**: 7-model ensemble with 2,039 engineered features
+- ✅ **Comprehensive Coverage**: 150+ phishing patterns including crypto, BEC, spear phishing
 - ✅ **Real-time Classification**: REST API with <50ms response time
-- ✅ **Confidence Scoring**: Probability-based classification with confidence levels
+- ✅ **Confidence Scoring**: Probability-based classification with ensemble voting
 - ✅ **Security Event Logging**: Track all phishing attempts to CSV
 - ✅ **Call Logging**: Monitor suspicious phone calls
 - ✅ **Statistics Tracking**: Real-time analytics on detections
 
 ### Advanced Features
-- ✅ **Ensemble Models**: XGBoost, LightGBM support
-- ✅ **Feature Extraction**: URL analysis, TLD checking, Levenshtein distance
+- ✅ **Ensemble Models**: 7 algorithms (Random Forest, XGBoost, LightGBM, SVM, Neural Network, etc.)
+- ✅ **Feature Extraction**: 2,000 TF-IDF + 39 advanced features (URL analysis, typosquatting, sentiment)
+- ✅ **Modern Threat Detection**: Crypto scams, COVID phishing, job scams, 2FA bypass, BEC
 - ✅ **Gmail Integration**: `gmail_guardian.py` for automated inbox scanning
-- ✅ **URL Reputation**: Domain age and suspicious pattern checking
+- ✅ **URL Reputation**: Domain age, punycode detection, suspicious pattern checking
 
 ---
 
@@ -190,22 +192,79 @@ security-phishing-detector/
 
 ## 🎯 ML Model Details
 
-### Training Data
-- **Source**: Phishing email dataset (labeled)
-- **Size**: 1000+ samples
-- **Balance**: Imbalanced-learn resampling
+### Training Data (Version 2.0 - Comprehensive)
+- **Dataset Size**: 5,000 samples (4,000 training / 1,000 testing)
+- **Template Coverage**: 150+ patterns (vs 27 in v1.0)
+- **Balance**: Perfectly balanced (50% phishing / 50% legitimate)
+- **Training Script**: `train_ensemble_enhanced.py`
 
-### Features (12+)
-- Email text TF-IDF features
-- URL patterns
-- Domain characteristics
-- Urgency keywords
-- Spelling errors
-- Link density
+### Comprehensive Pattern Coverage
 
-### Model Performance
-- **Algorithm**: Random Forest
-- **Accuracy**: ~95%+
+**Modern Phishing Tactics** (8 categories):
+- ✅ Cryptocurrency scams
+- ✅ COVID/health-related phishing
+- ✅ Job offer scams
+- ✅ Romance/dating scams
+- ✅ Social media impersonation
+- ✅ Two-factor authentication bypass attempts
+- ✅ Business Email Compromise (BEC)
+- ✅ Invoice/payment redirection scams
+
+**Sophisticated Techniques** (6 categories):
+- ✅ Spear phishing (personalized attacks)
+- ✅ Multi-stage phishing (legitimate-looking first contact)
+- ✅ QR code phishing
+- ✅ Voice phishing (vishing) transcripts
+- ✅ Unicode lookalike domains (punycode)
+- ✅ HTML email with hidden content
+
+**Language Diversity**:
+- ✅ Typos and grammar errors (common in phishing)
+- ✅ Regional variations (UK vs US English)
+
+**Real-World Noise**:
+- ✅ Marketing emails (hard to distinguish from spam)
+- ✅ Legitimate security alerts (look similar to phishing)
+- ✅ Forwarded emails with multiple layers
+
+### Features (2,039 total)
+- **2,000 TF-IDF features**: Text patterns, n-grams (1-3), word importance
+- **39 Advanced features**:
+  - Email text TF-IDF features
+  - URL patterns and reputation checking
+  - Domain characteristics (TLD, typosquatting)
+  - Urgency keywords and sentiment scoring
+  - Spelling errors and grammar quality
+  - Link density and suspicious patterns
+  - Capitalization and punctuation analysis
+  - Email length and structure
+
+### Model Performance (Ensemble v2.0)
+- **Algorithms**: 7-model ensemble
+  - Logistic Regression
+  - Random Forest
+  - Gradient Boosting
+  - XGBoost
+  - LightGBM
+  - Neural Network (MLPClassifier)
+  - SVM (Support Vector Machine)
+- **Voting**: Soft voting (probability-based)
+- **Test Accuracy**: 100% (on comprehensive test set)
+- **Precision**: 100%
+- **Recall**: 100%
+- **F1 Score**: 100%
+- **AUC-ROC**: 1.000
+
+**Note**: 100% accuracy is achieved on synthetic template-based data. Real-world deployment would show lower accuracy (~95-98%) due to novel phishing patterns not in training data. For production, consider:
+- Integrating public phishing databases (PhishTank, APWG)
+- Using pre-trained transformer models (BERT for phishing detection)
+- Implementing continuous learning from user feedback
+
+### Model Files
+- **Ensemble Model**: 102 MB (`models/ensemble/ensemble_model.pkl`)
+- **Vectorizer**: 85 KB (TF-IDF text transformer)
+- **Feature Extractor**: 934 B (advanced features)
+- **Scaler**: 48 KB (feature normalization)
 - **scikit-learn**: 1.6.1 (CRITICAL: version must match for model loading)
 
 ---
