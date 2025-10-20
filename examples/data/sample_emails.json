@@ -1,0 +1,120 @@
+{
+  "description": "Sample email dataset for testing PhishGuard ML",
+  "version": "1.0.0",
+  "total_samples": 15,
+  "phishing_samples": 10,
+  "legitimate_samples": 5,
+  "emails": [
+    {
+      "id": 1,
+      "category": "phishing",
+      "subcategory": "urgency_paypal",
+      "text": "URGENT! Your PayPal account has been suspended due to suspicious activity. Click here to verify your identity immediately: http://bit.ly/verify-paypal",
+      "indicators": ["urgency", "brand_impersonation", "shortened_url", "action_required"]
+    },
+    {
+      "id": 2,
+      "category": "phishing",
+      "subcategory": "urgency_banking",
+      "text": "IMMEDIATE ACTION REQUIRED: Your Wells Fargo account will be closed in 24 hours unless you verify your information. Click here now: http://secure-wellsfargo-verify.com",
+      "indicators": ["urgency", "deadline", "threat", "fake_domain"]
+    },
+    {
+      "id": 3,
+      "category": "phishing",
+      "subcategory": "prize_winning",
+      "text": "Congratulations! You've won $1,000,000 in our annual sweepstakes! Click to claim your prize immediately before it expires!",
+      "indicators": ["too_good_to_be_true", "urgency", "financial_incentive"]
+    },
+    {
+      "id": 4,
+      "category": "phishing",
+      "subcategory": "urgency_amazon",
+      "text": "Your Amazon order #A12345 could not be processed. Update your payment information now or your Prime membership will be cancelled: http://amz-secure.net/update",
+      "indicators": ["urgency", "brand_impersonation", "fake_domain", "threat"]
+    },
+    {
+      "id": 5,
+      "category": "phishing",
+      "subcategory": "authority_irs",
+      "text": "FINAL NOTICE: The IRS has detected irregularities in your tax return. You must respond within 48 hours to avoid legal action. Call 555-0123 or click here.",
+      "indicators": ["authority", "urgency", "legal_threat", "deadline"]
+    },
+    {
+      "id": 6,
+      "category": "phishing",
+      "subcategory": "urgency_microsoft",
+      "text": "Your Microsoft account has been accessed from an unusual location. Verify your identity immediately to prevent account closure: http://microsft-security.com",
+      "indicators": ["urgency", "brand_impersonation", "typo_domain", "security_concern"]
+    },
+    {
+      "id": 7,
+      "category": "phishing",
+      "subcategory": "urgency_apple",
+      "text": "Apple ID Security Alert: Your account will be disabled unless you confirm your information. Click here within 24 hours: http://appleid-verify.net",
+      "indicators": ["urgency", "brand_impersonation", "deadline", "fake_domain"]
+    },
+    {
+      "id": 8,
+      "category": "phishing",
+      "subcategory": "ceo_fraud",
+      "text": "Hi, this is the CEO. I need you to purchase $5000 in gift cards urgently for a client meeting. Please buy them now and send me the codes. Thanks.",
+      "indicators": ["authority", "urgency", "unusual_request", "gift_cards"]
+    },
+    {
+      "id": 9,
+      "category": "phishing",
+      "subcategory": "delivery_scam",
+      "text": "FedEx Delivery Failed: We attempted to deliver your package but no one was home. Click here to reschedule or your package will be returned: http://fedx-delivery.com",
+      "indicators": ["urgency", "brand_impersonation", "typo_domain", "action_required"]
+    },
+    {
+      "id": 10,
+      "category": "phishing",
+      "subcategory": "password_reset",
+      "text": "Your password will expire in 24 hours. Click here to reset your company password now or you will lose access to all systems: http://password-reset-portal.com",
+      "indicators": ["urgency", "deadline", "fake_domain", "credential_theft"]
+    },
+    {
+      "id": 11,
+      "category": "legitimate",
+      "subcategory": "order_confirmation",
+      "text": "Thank you for your Amazon order #123-4567890-1234567. Your package will arrive on Tuesday, October 24th. Track your shipment in your account.",
+      "indicators": ["order_number", "specific_date", "no_urgency", "no_links"]
+    },
+    {
+      "id": 12,
+      "category": "legitimate",
+      "subcategory": "meeting_invite",
+      "text": "Meeting scheduled for tomorrow at 2pm in conference room B. Agenda: Q4 planning review. Please confirm your attendance by replying to this email.",
+      "indicators": ["specific_details", "professional_tone", "no_urgency", "no_threats"]
+    },
+    {
+      "id": 13,
+      "category": "legitimate",
+      "subcategory": "newsletter",
+      "text": "This week's tech newsletter: New Python 3.12 features, AI trends in 2025, and upcoming webinars. Read the full newsletter on our blog.",
+      "indicators": ["informational", "no_action_required", "professional"]
+    },
+    {
+      "id": 14,
+      "category": "legitimate",
+      "subcategory": "receipt",
+      "text": "Your payment of $49.99 to XYZ Services has been processed successfully. Receipt #R-2025-1020-4567. You can view your invoice in your account dashboard.",
+      "indicators": ["specific_amount", "receipt_number", "no_urgency", "legitimate_business"]
+    },
+    {
+      "id": 15,
+      "category": "legitimate",
+      "subcategory": "support_response",
+      "text": "Thank you for contacting customer support. Your ticket #CS-789012 has been created. Our team will respond within 24-48 business hours. Reference your ticket number for follow-up.",
+      "indicators": ["ticket_number", "reasonable_timeline", "professional_tone"]
+    }
+  ],
+  "usage": {
+    "description": "Use this dataset to test the PhishGuard ML API",
+    "example_python": "import json; with open('sample_emails.json') as f: data = json.load(f)",
+    "api_endpoint": "POST http://localhost:8000/classify",
+    "request_format": {"email_text": "text content here"}
+  }
+}
