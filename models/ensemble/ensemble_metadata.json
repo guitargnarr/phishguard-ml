@@ -19,11 +19,11 @@
       "auc": 1.0
     },
     "random_forest": {
-      "accuracy": 0.99,
+      "accuracy": 0.987,
       "precision": 1.0,
-      "recall": 0.98,
-      "f1": 0.98989898989899,
-      "auc": 0.999952
+      "recall": 0.974,
+      "f1": 0.9868287740628167,
+      "auc": 0.99984
     },
     "gradient_boosting": {
       "accuracy": 1.0,
@@ -33,11 +33,11 @@
       "auc": 1.0
     },
     "adaboost": {
-      "accuracy": 0.947,
-      "precision": 0.9725158562367865,
-      "recall": 0.92,
-      "f1": 0.9455292908530318,
-      "auc": 0.9917119999999999
+      "accuracy": 0.956,
+      "precision": 0.975,
+      "recall": 0.936,
+      "f1": 0.9551020408163265,
+      "auc": 0.9936799999999999
     },
     "naive_bayes": {
       "error": "Negative values in data passed to MultinomialNB (input X)."
