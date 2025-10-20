@@ -1,0 +1,32 @@
+# Security Phishing Detector - Pinned Dependencies
+# Python Version: 3.9.6 (REQUIRED - models trained with this version)
+# Last Updated: 2025-10-20
+#
+# IMPORTANT: Use Python 3.9.6 (/usr/bin/python3)
+# Models were trained with scikit-learn 1.6.1 - version must match
+
+# Core API Framework
+fastapi==0.118.0
+uvicorn==0.37.0
+pydantic==2.11.1
+python-multipart==0.0.20
+
+# Machine Learning Core (EXACT versions required for model compatibility)
+scikit-learn==1.6.1  # CRITICAL: Models trained with this version
+pandas>=2.0.0,<3.0.0  # Latest compatible with Python 3.9
+numpy>=1.24.0,<3.0.0
+joblib==1.5.2
+
+# Enhanced ML Models
+xgboost==2.1.4
+lightgbm==4.6.0
+imbalanced-learn==0.12.4  # Latest compatible with Python 3.9
+
+# Feature Extraction
+validators==0.35.0
+tldextract==5.3.0
+python-Levenshtein==0.27.1
+
+# Testing (optional but recommended)
+pytest==7.4.3
+httpx==0.28.1
