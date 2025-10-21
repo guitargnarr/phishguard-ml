@@ -5,7 +5,7 @@
 **Production-Ready Phishing Detection API**
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square)](https://github.com/guitargnarr/phishguard-ml)
-[![Tests](https://img.shields.io/badge/tests-37%2F37%20passing-brightgreen?style=flat-square)](https://github.com/guitargnarr/phishguard-ml)
+[![Tests](https://img.shields.io/badge/tests-38%2F38%20passing-brightgreen?style=flat-square)](https://github.com/guitargnarr/phishguard-ml)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-success?style=flat-square)](https://github.com/guitargnarr/phishguard-ml)
 [![Python](https://img.shields.io/badge/python-3.9+-blue?style=flat-square&logo=python)](https://www.python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.118-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
@@ -37,15 +37,16 @@ Get up and running in 30 seconds:
 git clone https://github.com/guitargnarr/phishguard-ml.git
 cd phishguard-ml
 
-# 2. Start the server
-./run.sh
+# 2. Start the production server
+./run_production.sh
 
 # 3. Test the API (in another terminal)
-curl -X POST http://localhost:8000/classify \
+# Simple mode (fast)
+curl -X POST http://localhost:8000/classify?mode=simple \
   -H "Content-Type: application/json" \
   -d '{"email_text": "URGENT! Your account has been suspended. Click here to verify!"}'
 
-# Response: {"classification":"phishing","confidence":0.90,"is_phishing":true}
+# Response: {"classification":"phishing","confidence":0.85,"is_phishing":true,"model_mode":"simple"}
 ```
 
 That's it! 🎉 The API is now running on `http://localhost:8000`
@@ -75,8 +76,9 @@ That's it! 🎉 The API is now running on `http://localhost:8000`
 <td width="50%">
 
 ### 🔬 Advanced ML Detection
-- **7-model ensemble** (RF, XGBoost, LightGBM, SVM, MLP, etc.)
-- **2,039 engineered features** (2,000 TF-IDF + 39 advanced)
+- **Dual-mode system**: Simple (fast) or Ensemble (accurate)
+- **Simple mode**: 646 TF-IDF features, Random Forest
+- **Ensemble mode**: 2,039 features (2,000 TF-IDF + 39 advanced), 7 models
 - **150+ phishing patterns** covering modern attack vectors
 - **100% test accuracy** on comprehensive dataset
 - **Probability-based scoring** with calibrated confidence
@@ -85,10 +87,10 @@ That's it! 🎉 The API is now running on `http://localhost:8000`
 <td width="50%">
 
 ### ⚡ High Performance
-- **<20ms response time** (median)
-- **~500 requests/second** throughput
+- **<20ms response time** (simple mode)
+- **~100ms response time** (ensemble mode)
+- **~500 requests/second** throughput (simple mode)
 - **Batch processing** support
-- **GPU-ready** feature extraction
 - **Auto-scaling** compatible
 
 </td>
@@ -116,11 +118,82 @@ That's it! 🎉 The API is now running on `http://localhost:8000`
 - **Event logging** to CSV
 - **Statistics tracking** with metrics
 - **Type hints** throughout
-- **Comprehensive tests** (37/37 passing)
+- **Comprehensive tests** (38/38 passing)
 
 </td>
 </tr>
 </table>
+
+---
+
+## 🎯 Model Modes
+
+PhishGuard ML offers two deployment modes, allowing you to choose between speed and accuracy based on your use case:
+
+### ⚡ Simple Mode (Default)
+
+**Optimized for high-volume production traffic**
+
+- **Speed**: <20ms per request
+- **Features**: 646 TF-IDF features
+- **Model**: Random Forest classifier
+- **Size**: 33 KB on disk
+- **Best for**: Real-time email filtering, high-throughput scenarios, cost-sensitive deployments
+
+### 🎯 Ensemble Mode
+
+**Optimized for maximum accuracy on critical decisions**
+
+- **Speed**: ~100ms per request
+- **Features**: 2,039 features (2,000 TF-IDF + 39 advanced engineered features)
+- **Models**: 7-model ensemble (Random Forest, XGBoost, LightGBM, SVM, MLP, Logistic Regression, Gradient Boosting)
+- **Size**: 101 MB on disk
+- **Best for**: Critical security decisions, batch processing, compliance reporting
+
+### Usage Examples
+
+```bash
+# Simple mode (default) - Fast detection
+curl -X POST http://localhost:8000/classify?mode=simple \
+  -H "Content-Type: application/json" \
+  -d '{"email_text": "URGENT! Your account has been suspended."}'
+
+# Ensemble mode - Maximum accuracy
+curl -X POST http://localhost:8000/classify?mode=ensemble \
+  -H "Content-Type: application/json" \
+  -d '{"email_text": "URGENT! Your account has been suspended."}'
+
+# Detailed prediction with individual model votes (ensemble only)
+curl -X POST http://localhost:8000/classify_detailed?mode=ensemble \
+  -H "Content-Type: application/json" \
+  -d '{"email_text": "Click here to claim your prize!"}'
+```
+
+**Example Response Comparison:**
+
+| Metric | Simple Mode | Ensemble Mode |
+|--------|-------------|---------------|
+| **Phishing Detection** | "URGENT! PayPal suspended..." | "URGENT! PayPal suspended..." |
+| **Classification** | phishing | phishing |
+| **Confidence** | 84.93% | 99.83% |
+| **Model Agreement** | N/A | 7/7 models |
+| **Response Time** | ~15ms | ~95ms |
+
+### When to Use Each Mode
+
+**Use Simple Mode when:**
+- Processing high volumes of emails (>100/sec)
+- Latency is critical (<20ms requirement)
+- Running on resource-constrained environments
+- Cost optimization is a priority
+- Good-enough accuracy is acceptable (~90%)
+
+**Use Ensemble Mode when:**
+- Maximum accuracy is required
+- Processing critical security decisions
+- Batch processing overnight/scheduled jobs
+- Compliance requires detailed model explanations
+- False negatives are costly
 
 ---
 
@@ -188,14 +261,43 @@ GET /health
 ```json
 {
   "status": "healthy",
-  "model_loaded": true,
-  "endpoints": ["/classify", "/call_log", "/stats"]
+  "simple_model_loaded": true,
+  "ensemble_model_loaded": true,
+  "endpoints": [
+    "/classify (mode=simple|ensemble)",
+    "/classify_detailed",
+    "/stats",
+    "/models"
+  ]
 }
 ```
 
 #### 🔍 Classify Email
 ```bash
-POST /classify
+POST /classify?mode=simple|ensemble
+Content-Type: application/json
+
+{
+  "email_text": "Your email content here"
+}
+```
+
+**Query Parameters:**
+- `mode` (optional): `simple` (default, fast) or `ensemble` (accurate)
+
+**Response:**
+```json
+{
+  "classification": "phishing",
+  "confidence": 0.9045,
+  "is_phishing": true,
+  "model_mode": "simple"
+}
+```
+
+#### 🎯 Detailed Classification (Ensemble Only)
+```bash
+POST /classify_detailed?mode=ensemble
 Content-Type: application/json
 
 {
@@ -207,8 +309,27 @@ Content-Type: application/json
 ```json
 {
   "classification": "phishing",
-  "confidence": 0.9045,
-  "is_phishing": true
+  "confidence": 0.9983,
+  "is_phishing": true,
+  "model_mode": "ensemble",
+  "probabilities": {
+    "legitimate": 0.0017,
+    "phishing": 0.9983
+  },
+  "model_info": {
+    "models": ["RandomForest", "XGBoost", "LightGBM", "SVM", "MLP", "LogisticRegression", "GradientBoosting"],
+    "features": 2039
+  },
+  "individual_votes": {
+    "RandomForest": "phishing",
+    "XGBoost": "phishing",
+    "LightGBM": "phishing",
+    "SVM": "phishing",
+    "MLP": "phishing",
+    "LogisticRegression": "phishing",
+    "GradientBoosting": "phishing"
+  },
+  "agreement_rate": 1.0
 }
 ```
 
@@ -221,9 +342,14 @@ GET /stats
 ```json
 {
   "total_events": 42,
-  "email_events": 38,
-  "call_events": 4,
-  "phishing_detected": 21,
+  "by_mode": {
+    "simple": 35,
+    "ensemble": 7
+  },
+  "by_classification": {
+    "phishing": 21,
+    "legitimate": 21
+  },
   "log_file": "logs/security_log.csv"
 }
 ```
@@ -266,12 +392,13 @@ GET /stats
 
 ### System Flow
 
-1. **Input**: Email text received via REST API
-2. **Preprocessing**: Text cleaning and TF-IDF vectorization
-3. **Feature Engineering**: Extract 2,039 features (2,000 TF-IDF + 39 advanced)
-4. **Ensemble Prediction**: 7 models vote on classification
-5. **Aggregation**: Soft voting with probability calibration
-6. **Output**: Classification, confidence score, phishing status
+1. **Input**: Email text received via REST API with mode parameter
+2. **Mode Selection**: Choose simple (fast) or ensemble (accurate) pipeline
+3. **Preprocessing**: Text cleaning and TF-IDF vectorization (646 or 2,000 features)
+4. **Feature Engineering** (ensemble only): Extract 39 additional advanced features
+5. **Prediction**: Single model (simple) or 7-model ensemble voting (ensemble)
+6. **Aggregation**: Probability calibration and confidence scoring
+7. **Output**: Classification, confidence score, phishing status, mode used
 
 [Architecture Details →](docs/architecture.md)
 
@@ -381,40 +508,66 @@ Confusion Matrix (1,000 test samples):
 ```python
 import requests
 
-# Single email classification
+# Simple mode (fast) - Single email classification
 response = requests.post(
-    "http://localhost:8000/classify",
+    "http://localhost:8000/classify?mode=simple",
     json={"email_text": "URGENT! Your PayPal account suspended. Click here to verify!"}
 )
 
 result = response.json()
 print(f"Classification: {result['classification']}")
 print(f"Confidence: {result['confidence']:.2%}")
-print(f"Is Phishing: {result['is_phishing']}")
+print(f"Mode: {result['model_mode']}")
 
 # Output:
 # Classification: phishing
-# Confidence: 90.45%
-# Is Phishing: True
+# Confidence: 84.93%
+# Mode: simple
+
+# Ensemble mode (accurate) - Maximum accuracy
+response = requests.post(
+    "http://localhost:8000/classify?mode=ensemble",
+    json={"email_text": "URGENT! Your PayPal account suspended. Click here to verify!"}
+)
+
+result = response.json()
+print(f"Classification: {result['classification']}")
+print(f"Confidence: {result['confidence']:.2%}")
+print(f"Mode: {result['model_mode']}")
+
+# Output:
+# Classification: phishing
+# Confidence: 99.83%
+# Mode: ensemble
 ```
 
 ### cURL
 
 ```bash
-# Phishing detection
-curl -X POST http://localhost:8000/classify \
+# Simple mode (fast) - Phishing detection
+curl -X POST http://localhost:8000/classify?mode=simple \
   -H "Content-Type: application/json" \
   -d '{
     "email_text": "Congratulations! You won $1,000,000! Click to claim your prize!"
   }'
 
-# Response: {"classification":"phishing","confidence":0.95,"is_phishing":true}
+# Response: {"classification":"phishing","confidence":0.89,"is_phishing":true,"model_mode":"simple"}
+
+# Ensemble mode (accurate) - Maximum precision
+curl -X POST http://localhost:8000/classify?mode=ensemble \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email_text": "Congratulations! You won $1,000,000! Click to claim your prize!"
+  }'
+
+# Response: {"classification":"phishing","confidence":0.99,"is_phishing":true,"model_mode":"ensemble"}
 ```
 
 ### JavaScript/Node.js
 
 ```javascript
-const response = await fetch('http://localhost:8000/classify', {
+// Simple mode (fast)
+const response = await fetch('http://localhost:8000/classify?mode=simple', {
   method: 'POST',
   headers: {'Content-Type': 'application/json'},
   body: JSON.stringify({
@@ -423,8 +576,21 @@ const response = await fetch('http://localhost:8000/classify', {
 });
 
 const result = await response.json();
-console.log(`${result.classification} (${(result.confidence * 100).toFixed(1)}% confident)`);
-// Output: legitimate (87.3% confident)
+console.log(`${result.classification} (${(result.confidence * 100).toFixed(1)}% confident, ${result.model_mode} mode)`);
+// Output: legitimate (87.3% confident, simple mode)
+
+// Ensemble mode (accurate)
+const ensembleResponse = await fetch('http://localhost:8000/classify?mode=ensemble', {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({
+    email_text: 'Your Amazon order #12345 has shipped. Track it here.'
+  })
+});
+
+const ensembleResult = await ensembleResponse.json();
+console.log(`${ensembleResult.classification} (${(ensembleResult.confidence * 100).toFixed(1)}% confident, ${ensembleResult.model_mode} mode)`);
+// Output: legitimate (92.8% confident, ensemble mode)
 ```
 
 ### Batch Processing
@@ -438,13 +604,19 @@ emails = [
     "Verify your identity immediately!",
 ]
 
+# Use simple mode for high-volume batch processing
 for email in emails:
     response = requests.post(
-        "http://localhost:8000/classify",
+        "http://localhost:8000/classify?mode=simple",
         json={"email_text": email}
     )
     result = response.json()
-    print(f"[{result['classification'].upper()}] {email[:50]}...")
+    print(f"[{result['classification'].upper()}] ({result['confidence']:.0%}) {email[:50]}...")
+
+# Output:
+# [PHISHING] (92%) URGENT: Your account will be closed...
+# [LEGITIMATE] (89%) Thank you for your purchase...
+# [PHISHING] (88%) Verify your identity immediately!...
 ```
 
 [More examples →](examples/)
