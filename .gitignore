@@ -57,3 +57,7 @@ test_*.py
 check_*.py
 verification_*.txt
 *_results_*.txt
+
+# Large ML Model Files (train locally, don't commit)
+models/ensemble/ensemble_model.pkl
+models/ensemble/*.pkl
