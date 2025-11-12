@@ -1,0 +1,15 @@
+timestamp,source,content,classification,confidence,metadata
+2025-10-20T18:15:31.676245,email,URGENT! Your PayPal account has been suspended. Click here immediately to verify your identity: http://bit.ly/paypal-verify,phishing,0.904,API classification
+2025-10-20T18:15:33.476124,email,Thank you for your recent purchase. Order #12345 will arrive tomorrow. You can track your shipment at our website.,legitimate,0.867,API classification
+2025-10-20T19:40:15.043531,simple,phishing,0.745,URGENT! Your PayPal account has been suspended. Click here!
+2025-10-20T19:40:15.048301,simple,legitimate,0.776,Thank you for your order. Your package will arrive tomorrow.
+2025-10-20T19:40:15.194030,ensemble,phishing,0.997,"Congratulations! You've won $1,000,000! Click to claim!"
+2025-10-20T19:40:15.303462,ensemble,legitimate,0.995,Meeting scheduled for tomorrow at 2pm.
+2025-10-20T19:40:15.309367,simple,phishing,0.662,Test email
+2025-10-20T19:40:15.312032,simple,phishing,0.662,Test email
+2025-10-20T19:56:54.286062,simple,phishing,0.745,URGENT! Your PayPal account has been suspended. Click here!
+2025-10-20T19:56:54.289618,simple,legitimate,0.776,Thank you for your order. Your package will arrive tomorrow.
+2025-10-20T19:56:54.402385,ensemble,phishing,0.997,"Congratulations! You've won $1,000,000! Click to claim!"
+2025-10-20T19:56:54.512152,ensemble,legitimate,0.995,Meeting scheduled for tomorrow at 2pm.
+2025-10-20T19:56:54.517028,simple,phishing,0.662,Test email
+2025-10-20T19:56:54.518797,simple,phishing,0.662,Test email

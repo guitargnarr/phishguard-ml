@@ -13,15 +13,13 @@
 
 ---
 
-## Python Environment
+## ✅ Python Environment (Updated October 22, 2025)
 
-**Python setup:** See `~/.claude/templates/PYTHON_SETUP.md`
-**Virtual env:** See `~/.claude/templates/VIRTUAL_ENV.md`
-**Common issues:** See `~/.claude/templates/COMMON_ISSUES.md`
+**CRITICAL:** This project requires **Python 3.9.6** for ML model compatibility.
 
-### CRITICAL: Project-Specific Python Requirement
+### Required Setup
 
-**Python Version:** 3.9.6 (REQUIRED - System Python)
+**Python Version:** 3.9.6 (System Python)
 - **Location:** `/usr/bin/python3`
 - **Reason:** ML models trained with scikit-learn 1.6.1 on Python 3.9.6
 - **Virtual Environment:** Use `/usr/bin/python3 -m venv venv`
@@ -31,7 +29,7 @@
 ```bash
 cd ~/Projects/Security-Tools/security-phishing-detector
 
-# Create venv with SYSTEM Python 3.9.6 (not 3.14)
+# Create venv with SYSTEM Python 3.9.6
 /usr/bin/python3 -m venv venv
 
 # Activate
@@ -45,7 +43,24 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+### Verification
+
+```bash
+source venv/bin/activate
+python --version  # Should show: Python 3.9.6
+which python      # Should point to venv/bin/python
+```
+
 **If Python 3.14 is used by mistake:** ML models may not load correctly due to scikit-learn version incompatibility.
+
+### Global Python Status (Reference)
+
+**System resolved Python corruption issue on October 22, 2025:**
+- Python 3.14.0 now available at `/Library/Frameworks/Python.framework/Versions/3.14/bin/python3`
+- Python 3.9.6 still available at `/usr/bin/python3`
+- This project uses Python 3.9.6 intentionally
+
+**See global CLAUDE.md (~/.claude/CLAUDE.md) for full Python environment details.**
 
 ---
 
@@ -111,6 +126,20 @@ python3 train_models.py
 - API response time: <100ms per email
 - Batch processing: 1000 emails/minute
 - Model accuracy: >95% (as of last training)
+
+---
+
+## Known Issues
+
+### ⚠️ Python Version Sensitivity
+- Models were trained with Python 3.9.6 and scikit-learn 1.6.1
+- Using different versions may cause unpredictable behavior
+- Always verify Python version before development
+
+### requirements.txt Comment ERROR (Fixed)
+- ~~requirements.txt previously claimed "Python 3.9.6 REQUIRED"~~
+- This is **correct** for this project
+- Do NOT upgrade to Python 3.14 for this project
 
 ---
 
