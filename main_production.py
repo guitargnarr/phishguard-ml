@@ -307,8 +307,12 @@ if __name__ == "__main__":
     print("  GET  /models")
     print("  GET  /docs (Swagger UI)")
 
-    print("\n📡 Starting server on http://localhost:8000")
+    # Read PORT from environment (Railway, Render, etc.) or default to 8000
+    port = int(os.environ.get("PORT", 8000))
+
+    print(f"\n📡 Starting server on http://0.0.0.0:{port}")
     print("   Press Ctrl+C to stop")
     print("=" * 70 + "\n")
 
-    uvicorn.run("main_production:app", host="0.0.0.0", port=8000, reload=True)
+    # reload=False for production (no file watching needed)
+    uvicorn.run("main_production:app", host="0.0.0.0", port=port, reload=False)
