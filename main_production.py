@@ -131,7 +131,7 @@ init_security_log()
 @app.post("/classify", response_model=ClassificationResponse)
 async def classify_email(
     req: ClassificationRequest,
-    mode: str = Query('simple', regex="^(simple|ensemble)$")
+    mode: str = Query('simple', pattern="^(simple|ensemble)$")
 ):
     """
     Classify an email as phishing or legitimate.
@@ -178,7 +178,7 @@ async def classify_email(
 @app.post("/classify_detailed", response_model=DetailedClassificationResponse)
 async def classify_detailed(
     req: ClassificationRequest,
-    mode: str = Query('ensemble', regex="^(simple|ensemble)$")
+    mode: str = Query('ensemble', pattern="^(simple|ensemble)$")
 ):
     """
     Get detailed classification with model votes and confidence breakdown.
