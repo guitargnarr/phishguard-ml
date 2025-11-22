@@ -64,14 +64,18 @@ app.add_middleware(
 # ------------------------------------------------------------------ #
 # 3. Request / Response Models
 # ------------------------------------------------------------------ #
+
+
 class ClassificationRequest(BaseModel):
     email_text: str
+
 
 class ClassificationResponse(BaseModel):
     classification: str
     confidence: float
     is_phishing: bool
     model_mode: str
+
 
 class DetailedClassificationResponse(BaseModel):
     classification: str
@@ -83,12 +87,14 @@ class DetailedClassificationResponse(BaseModel):
     individual_votes: Optional[dict] = None
     agreement_rate: Optional[float] = None
 
+
 # ------------------------------------------------------------------ #
 # 4. Logging System
 # ------------------------------------------------------------------ #
 LOG_DIR = Path("logs")
 LOG_DIR.mkdir(exist_ok=True)
 SECURITY_LOG = LOG_DIR / "security_log.csv"
+
 
 def init_security_log():
     """Initialize the security log with headers if it doesn't exist."""
@@ -99,6 +105,7 @@ def init_security_log():
                 "timestamp", "mode", "classification",
                 "confidence", "text_preview"
             ])
+
 
 def log_classification(mode: str, classification: str, confidence: float, text: str):
     """Log classification event."""
@@ -112,12 +119,15 @@ def log_classification(mode: str, classification: str, confidence: float, text: 
             text[:100]  # Privacy: only first 100 chars
         ])
 
+
 # Initialize log
 init_security_log()
 
 # ------------------------------------------------------------------ #
 # 5. Classification Endpoints
 # ------------------------------------------------------------------ #
+
+
 @app.post("/classify", response_model=ClassificationResponse)
 async def classify_email(
     req: ClassificationRequest,
@@ -231,6 +241,7 @@ async def health_check():
         ]
     }
 
+
 @app.get("/stats")
 async def get_stats():
     """Get statistics about logged classifications."""
@@ -261,6 +272,7 @@ async def get_stats():
         },
         "log_file": str(SECURITY_LOG)
     }
+
 
 @app.get("/models")
 async def get_models_info():

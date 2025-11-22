@@ -10,20 +10,21 @@ from datetime import datetime, timedelta
 import random
 import time
 
+
 class GmailSimulator:
     """Simulates Gmail integration to demonstrate Security Copilot capabilities"""
-    
+
     def __init__(self):
         self.security_api = "http://localhost:8000"
         self.simulated_emails = self.generate_sample_emails()
-        
+
         print("=" * 70)
         print("🛡️  GMAIL SECURITY GUARDIAN - DEMO MODE")
         print("=" * 70)
         print("This demonstration shows how the Security Copilot would protect")
         print("your Gmail inbox in real-time.")
         print()
-    
+
     def generate_sample_emails(self):
         """Generate realistic email samples"""
         return [
@@ -105,7 +106,7 @@ International Lottery Commission""",
                 "timestamp": datetime.now() - timedelta(minutes=30)
             }
         ]
-    
+
     def analyze_email(self, email):
         """Analyze email with Security Copilot API"""
         print(f"\n{'='*60}")
@@ -115,10 +116,10 @@ International Lottery Commission""",
         print(f"Subject: {email['subject']}")
         print(f"Received: {email['timestamp'].strftime('%Y-%m-%d %H:%M')}")
         print()
-        
+
         # Prepare email content
         email_content = f"From: {email['from']}\nSubject: {email['subject']}\n\n{email['body']}"
-        
+
         # Check with Security Copilot
         try:
             response = requests.post(
@@ -129,17 +130,17 @@ International Lottery Commission""",
                 },
                 timeout=10
             )
-            
+
             if response.status_code == 200:
                 result = response.json()
-                
+
                 # Display analysis
                 if result['classification'] == 'phishing':
                     print("🚨 PHISHING DETECTED!")
                     print(f"Confidence: {result['confidence']:.1%}")
                     print()
                     print("📋 AUTOMATED ACTIONS:")
-                    
+
                     if result['confidence'] > 0.85:
                         print("  ✓ Email moved to spam folder")
                         print("  ✓ Sender blocked")
@@ -147,7 +148,7 @@ International Lottery Commission""",
                     else:
                         print("  ✓ Email flagged as suspicious")
                         print("  ✓ Warning label added")
-                    
+
                     # Check for dangerous URLs
                     if result.get('url_analysis'):
                         print("\n⚠️  DANGEROUS URLs FOUND:")
@@ -163,7 +164,7 @@ International Lottery Commission""",
                     print("\n📋 ACTIONS:")
                     print("  ✓ Email delivered to inbox")
                     print("  ✓ Sender marked as safe")
-                
+
                 # Show advanced features if high-risk
                 if result.get('advanced_features') and result['classification'] == 'phishing':
                     features = result['advanced_features']
@@ -174,37 +175,37 @@ International Lottery Commission""",
                         print(f"  • Suspicious phrases detected: {features['suspicious_phrase_count']}")
                     if features.get('has_shortener', 0) > 0:
                         print("  • URL shorteners detected")
-                
+
                 return result
-                
+
         except Exception as e:
             print(f"❌ Error analyzing email: {e}")
             return None
-    
+
     def simulate_inbox_scan(self):
         """Simulate scanning entire inbox"""
         print("\n" + "="*70)
         print("📥 SIMULATING INBOX SCAN")
         print("="*70)
         print(f"Scanning {len(self.simulated_emails)} emails...\n")
-        
+
         time.sleep(1)
-        
+
         phishing_found = []
         legitimate = []
-        
+
         for i, email in enumerate(self.simulated_emails, 1):
             print(f"[{i}/{len(self.simulated_emails)}]", end="")
             result = self.analyze_email(email)
-            
+
             if result:
                 if result['classification'] == 'phishing':
                     phishing_found.append((email, result))
                 else:
                     legitimate.append((email, result))
-            
+
             time.sleep(0.5)
-        
+
         # Summary
         print("\n\n" + "="*70)
         print("📊 SCAN SUMMARY")
@@ -213,7 +214,7 @@ International Lottery Commission""",
         print(f"🚨 Phishing Detected: {len(phishing_found)}")
         print(f"✅ Legitimate Emails: {len(legitimate)}")
         print(f"Protection Rate: {(len(phishing_found)/len(self.simulated_emails))*100:.1f}%")
-        
+
         if phishing_found:
             print("\n⚠️  THREATS BLOCKED:")
             for email, result in phishing_found:
@@ -221,19 +222,19 @@ International Lottery Commission""",
                 print(f"    From: {email['from']}")
                 print(f"    Confidence: {result['confidence']:.1%}")
                 print(f"    Action: {'Deleted' if result['confidence'] > 0.85 else 'Flagged'}")
-        
+
         print("\n✅ SAFE EMAILS:")
         for email, result in legitimate:
             print(f"  • {email['subject'][:50]}")
             print(f"    From: {email['from']}")
-    
+
     def simulate_realtime_monitoring(self):
         """Simulate real-time email monitoring"""
         print("\n" + "="*70)
         print("🔍 SIMULATING REAL-TIME MONITORING")
         print("="*70)
         print("Monitoring for new emails... (Press Ctrl+C to stop)\n")
-        
+
         try:
             # Simulate receiving new emails
             new_emails = [
@@ -252,30 +253,30 @@ International Lottery Commission""",
                     "timestamp": datetime.now()
                 }
             ]
-            
+
             for i in range(10):
                 print(f"⏳ Checking... [{datetime.now().strftime('%H:%M:%S')}]", end="\r")
                 time.sleep(2)
-                
+
                 if i == 3:
                     print(f"\n📬 New email detected!")
                     self.analyze_email(new_emails[0])
                     print("\n🛡️ Threat neutralized! Continuing monitoring...")
-                
+
                 if i == 7:
                     print(f"\n📬 New email detected!")
                     self.analyze_email(new_emails[1])
                     print("\n✅ Safe email delivered. Continuing monitoring...")
-            
+
         except KeyboardInterrupt:
             print("\n\n⏹️  Monitoring stopped")
-    
+
     def show_protection_features(self):
         """Display all protection features"""
         print("\n" + "="*70)
         print("🛡️  GMAIL PROTECTION FEATURES")
         print("="*70)
-        
+
         features = [
             ("🔍 Real-time Scanning", "Every email analyzed before reaching inbox"),
             ("🤖 ML Ensemble Model", "7 algorithms with 98%+ accuracy"),
@@ -288,15 +289,16 @@ International Lottery Commission""",
             ("🔐 Privacy First", "All processing done locally"),
             ("📈 Threat Intelligence", "Updates from global threat feeds")
         ]
-        
+
         for feature, description in features:
             print(f"\n{feature}")
             print(f"  {description}")
 
+
 def main():
     """Run the Gmail simulation demo"""
     print("\n🚀 Starting Gmail Security Guardian Demo...\n")
-    
+
     # Check API
     try:
         response = requests.get("http://localhost:8000/health", timeout=2)
@@ -307,9 +309,9 @@ def main():
     except:
         print("❌ Security API not available. Start with: python3 main_enhanced.py")
         return
-    
+
     simulator = GmailSimulator()
-    
+
     # Run demonstrations
     print("\n" + "="*70)
     print("SELECT DEMO:")
@@ -319,10 +321,10 @@ def main():
     print("3. Show Protection Features")
     print("4. Run All Demos")
     print()
-    
+
     try:
         choice = input("Enter choice (1-4): ").strip()
-        
+
         if choice == "1":
             simulator.simulate_inbox_scan()
         elif choice == "2":
@@ -336,10 +338,10 @@ def main():
         else:
             # Default: run inbox scan
             simulator.simulate_inbox_scan()
-            
+
     except KeyboardInterrupt:
         print("\n\nDemo stopped by user")
-    
+
     print("\n" + "="*70)
     print("✅ DEMO COMPLETE")
     print("="*70)
@@ -351,6 +353,7 @@ def main():
     print("3. Update .env file with new app password")
     print("4. Run: python3 gmail_guardian.py --monitor")
     print("\nYour inbox will be protected 24/7!")
+
 
 if __name__ == "__main__":
     main()

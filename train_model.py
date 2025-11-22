@@ -23,7 +23,7 @@ def generate_synthetic_dataset():
     Returns:
         DataFrame with email text and labels
     """
-    
+
     # Templates for phishing emails
     phishing_templates = [
         "URGENT: Your {account} account will be suspended! Click here to verify your password immediately.",
@@ -47,7 +47,7 @@ def generate_synthetic_dataset():
         "Free gift card worth ${amount}! Limited quantity - act fast!",
         "Your {account} storage is full. Upgrade now or lose your files: {url}"
     ]
-    
+
     # Templates for legitimate emails
     legitimate_templates = [
         "Thank you for your recent purchase. Your order #{order} has been shipped and will arrive soon.",
@@ -71,18 +71,18 @@ def generate_synthetic_dataset():
         "Service maintenance scheduled for {date}. Expected downtime: 2 hours.",
         "Thank you for attending our webinar. Recording and resources attached."
     ]
-    
+
     # Variables for template filling
     accounts = ['PayPal', 'Amazon', 'Netflix', 'Apple', 'Google', 'Microsoft', 'Bank of America', 'Chase']
     urls = ['bit.ly/x7k9m', 'tinyurl.com/abc123', 'shorturl.at/zxc456', '192.168.1.1/verify', 'verify-account.com']
     legitimate_urls = ['account.company.com', 'support.service.com', 'help.product.com']
     amounts = [100, 500, 1000, 5000, 10000]
     discounts = [25, 50, 70, 90]
-    
+
     # Generate dataset
     emails = []
     labels = []
-    
+
     # Generate phishing emails
     for _ in range(500):
         template = random.choice(phishing_templates)
@@ -98,17 +98,17 @@ def generate_synthetic_dataset():
             confirmation="CNF" + str(random.randint(100000, 999999)),
             meeting="Team Sync"
         )
-        
+
         # Add variations
         if random.random() > 0.5:
             email = email.upper()  # Some phishing emails use all caps
         if random.random() > 0.7:
             email += "!!!"  # Add urgency markers
-            
+
         emails.append(email)
         labels.append(1)  # 1 for phishing
-    
-    # Generate legitimate emails  
+
+    # Generate legitimate emails
     for _ in range(500):
         template = random.choice(legitimate_templates)
         email = template.format(
@@ -122,23 +122,23 @@ def generate_synthetic_dataset():
             confirmation="CNF" + str(random.randint(100000, 999999)),
             meeting="Team Sync"
         )
-        
+
         # Add footer to some legitimate emails
         if random.random() > 0.5:
             email += "\n\nTo unsubscribe from these emails, click here. Privacy Policy | Terms of Service"
-            
+
         emails.append(email)
         labels.append(0)  # 0 for legitimate
-    
+
     # Create DataFrame
     df = pd.DataFrame({
         'email_text': emails,
         'label': labels
     })
-    
+
     # Shuffle the dataset
     df = df.sample(frac=1, random_state=42).reset_index(drop=True)
-    
+
     return df
 
 
@@ -152,21 +152,21 @@ def train_model(df):
     Returns:
         Tuple of (trained_model, vectorizer, metrics_dict)
     """
-    
+
     print("📊 Preparing data for training...")
-    
+
     # Split features and labels
     X = df['email_text']
     y = df['label']
-    
+
     # Split into train and test sets
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
-    
+
     print(f"  Training samples: {len(X_train)}")
     print(f"  Testing samples: {len(X_test)}")
-    
+
     # Create TF-IDF vectorizer
     print("\n🔤 Creating TF-IDF features...")
     vectorizer = TfidfVectorizer(
@@ -176,13 +176,13 @@ def train_model(df):
         min_df=2,  # Ignore terms that appear in less than 2 documents
         max_df=0.95  # Ignore terms that appear in more than 95% of documents
     )
-    
+
     # Transform text to features
     X_train_tfidf = vectorizer.fit_transform(X_train)
     X_test_tfidf = vectorizer.transform(X_test)
-    
+
     print(f"  Feature dimensions: {X_train_tfidf.shape[1]}")
-    
+
     # Train LogisticRegression model
     print("\n🤖 Training LogisticRegression model...")
     model = LogisticRegression(
@@ -190,19 +190,19 @@ def train_model(df):
         max_iter=1000,
         class_weight='balanced'  # Handle any class imbalance
     )
-    
+
     model.fit(X_train_tfidf, y_train)
-    
+
     # Make predictions
     y_pred = model.predict(X_test_tfidf)
     y_pred_proba = model.predict_proba(X_test_tfidf)
-    
+
     # Calculate metrics
     accuracy = accuracy_score(y_test, y_pred)
-    
+
     print(f"\n✅ Training complete!")
     print(f"  Accuracy: {accuracy:.2%}")
-    
+
     # Generate classification report
     print("\n" + "="*60)
     print("📈 CLASSIFICATION REPORT")
@@ -213,7 +213,7 @@ def train_model(df):
         digits=3
     )
     print(report)
-    
+
     # Generate confusion matrix
     print("📊 CONFUSION MATRIX")
     print("-"*40)
@@ -223,25 +223,25 @@ def train_model(df):
     print(f"Actual Legit   {cm[0,0]:3d}    {cm[0,1]:3d}")
     print(f"       Phish   {cm[1,0]:3d}    {cm[1,1]:3d}")
     print("="*60)
-    
+
     # Get feature importance (top words for phishing)
     feature_names = vectorizer.get_feature_names_out()
     coef = model.coef_[0]
     top_phishing_indices = coef.argsort()[-20:][::-1]
     top_phishing_words = [feature_names[i] for i in top_phishing_indices]
-    
+
     print("\n🔍 Top 20 Phishing Indicators:")
     print("-"*40)
     for i, (word, score) in enumerate(zip(top_phishing_words, coef[top_phishing_indices]), 1):
         print(f"{i:2d}. {word:20s} (score: {score:.3f})")
-    
+
     metrics = {
         'accuracy': accuracy,
         'report': report,
         'confusion_matrix': cm,
         'top_features': top_phishing_words[:10]
     }
-    
+
     return model, vectorizer, metrics
 
 
@@ -254,20 +254,20 @@ def save_models(model, vectorizer, model_dir='models'):
         vectorizer: Fitted TfidfVectorizer
         model_dir: Directory to save models
     """
-    
+
     # Create models directory if it doesn't exist
     os.makedirs(model_dir, exist_ok=True)
-    
+
     # Save model
     model_path = os.path.join(model_dir, 'phishing_clf.pkl')
     joblib.dump(model, model_path)
     print(f"\n💾 Model saved to: {model_path}")
-    
+
     # Save vectorizer
     vectorizer_path = os.path.join(model_dir, 'tfidf_vec.pkl')
     joblib.dump(vectorizer, vectorizer_path)
     print(f"💾 Vectorizer saved to: {vectorizer_path}")
-    
+
     # Save metadata
     metadata = {
         'model_type': 'LogisticRegression',
@@ -276,34 +276,34 @@ def save_models(model, vectorizer, model_dir='models'):
         'features': vectorizer.max_features,
         'ngram_range': vectorizer.ngram_range
     }
-    
+
     metadata_path = os.path.join(model_dir, 'model_metadata.pkl')
     joblib.dump(metadata, metadata_path)
     print(f"💾 Metadata saved to: {metadata_path}")
-    
+
     return model_path, vectorizer_path
 
 
 def main():
     """Main training pipeline."""
-    
+
     print("🚀 PHISHING DETECTOR MODEL TRAINING")
     print("="*60)
-    
+
     # Generate synthetic dataset
     print("\n📧 Generating synthetic email dataset...")
     df = generate_synthetic_dataset()
     print(f"  Generated {len(df)} email samples")
     print(f"  Phishing emails: {df['label'].sum()}")
     print(f"  Legitimate emails: {len(df) - df['label'].sum()}")
-    
+
     # Train model
     model, vectorizer, metrics = train_model(df)
-    
+
     # Save models
     print("\n💾 Saving trained models...")
     model_path, vec_path = save_models(model, vectorizer)
-    
+
     # Final summary
     print("\n" + "="*60)
     print("🎉 TRAINING COMPLETE!")
@@ -316,7 +316,7 @@ def main():
         print(f"    {i}. {word}")
     print("\n✅ Models are ready for integration!")
     print("="*60)
-    
+
     return 0
 
 

@@ -12,9 +12,10 @@ from typing import Dict, Any
 # API Configuration
 API_BASE = "http://localhost:8000"
 
+
 class SecurityCopilotDemo:
     """Demo class showing real-world usage"""
-    
+
     def __init__(self):
         self.base_url = API_BASE
         print("=" * 70)
@@ -23,7 +24,7 @@ class SecurityCopilotDemo:
         print(f"API Server: {self.base_url}")
         print(f"Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print()
-    
+
     def check_server(self) -> bool:
         """Verify server is running"""
         try:
@@ -35,13 +36,13 @@ class SecurityCopilotDemo:
             print("❌ Server not responding. Start with: python3 main_enhanced.py")
             return False
         return False
-    
+
     def demo_email_check(self):
         """Demo: Check various email types"""
         print("\n" + "=" * 70)
         print("📧 EMAIL PHISHING DETECTION DEMO")
         print("=" * 70)
-        
+
         test_emails = [
             {
                 "name": "Netflix Phishing",
@@ -101,12 +102,12 @@ class SecurityCopilotDemo:
                 """
             }
         ]
-        
+
         for email in test_emails:
             print(f"\n📨 Testing: {email['name']}")
             print("-" * 40)
             print(f"Email preview: {email['text'][:100].strip()}...")
-            
+
             # Check with API
             response = requests.post(
                 f"{self.base_url}/classify",
@@ -115,10 +116,10 @@ class SecurityCopilotDemo:
                     "include_advanced_features": True
                 }
             )
-            
+
             if response.status_code == 200:
                 result = response.json()
-                
+
                 # Display result with visual indicators
                 if result['classification'] == 'phishing':
                     print(f"🚨 PHISHING DETECTED!")
@@ -127,7 +128,7 @@ class SecurityCopilotDemo:
                 else:
                     print(f"✅ LEGITIMATE EMAIL")
                     print(f"   Confidence: {(1 - result['confidence']):.1%}")
-                
+
                 # Show URL analysis if available
                 if result.get('url_analysis'):
                     print("   URLs found:")
@@ -136,13 +137,13 @@ class SecurityCopilotDemo:
                         print(f"     {risk_emoji} {url_info['url'][:50]}...")
                         if url_info.get('risk_factors'):
                             print(f"        Risks: {', '.join(url_info['risk_factors'][:2])}")
-    
+
     def demo_url_check(self):
         """Demo: Check suspicious URLs"""
         print("\n" + "=" * 70)
         print("🔗 URL SAFETY CHECK DEMO")
         print("=" * 70)
-        
+
         test_urls = [
             ("http://bit.ly/win-prize", "Shortened URL (prize scam)"),
             ("http://192.168.1.1/admin", "IP address instead of domain"),
@@ -152,19 +153,19 @@ class SecurityCopilotDemo:
             ("https://www.google.com", "Legitimate Google"),
             ("http://paypaI.com/login", "Homograph attack (fake PayPal)"),
         ]
-        
+
         for url, description in test_urls:
             print(f"\n🔍 Checking: {description}")
             print(f"   URL: {url}")
-            
+
             response = requests.post(
                 f"{self.base_url}/check_url",
                 json={"url": url}
             )
-            
+
             if response.status_code == 200:
                 result = response.json()
-                
+
                 # Visual risk indicator
                 if result['risk_level'] == 'high':
                     print(f"   🔴 HIGH RISK (Score: {result['risk_score']:.2f})")
@@ -172,16 +173,16 @@ class SecurityCopilotDemo:
                     print(f"   🟡 MEDIUM RISK (Score: {result['risk_score']:.2f})")
                 else:
                     print(f"   🟢 LOW RISK (Score: {result['risk_score']:.2f})")
-                
+
                 if result['risk_factors']:
                     print(f"   Reasons: {', '.join(result['risk_factors'][:3])}")
-    
+
     def demo_sms_check(self):
         """Demo: Check SMS/text messages"""
         print("\n" + "=" * 70)
         print("📱 SMS SCAM DETECTION DEMO")
         print("=" * 70)
-        
+
         test_messages = [
             {
                 "text": "Your package is waiting! Track: http://ups-track.tk/PKG123",
@@ -209,12 +210,12 @@ class SecurityCopilotDemo:
                 "description": "Bank scam with premium number"
             }
         ]
-        
+
         for msg in test_messages:
             print(f"\n📲 Testing: {msg['description']}")
             print(f"   From: {msg['sender']}")
             print(f"   Message: {msg['text'][:60]}...")
-            
+
             response = requests.post(
                 f"{self.base_url}/analyze_sms",
                 json={
@@ -222,10 +223,10 @@ class SecurityCopilotDemo:
                     "sender": msg['sender']
                 }
             )
-            
+
             if response.status_code == 200:
                 result = response.json()
-                
+
                 if result['is_scam']:
                     print(f"   🚨 SCAM DETECTED!")
                     print(f"      Type: {result['classification']}")
@@ -235,15 +236,15 @@ class SecurityCopilotDemo:
                 else:
                     print(f"   ✅ LEGITIMATE MESSAGE")
                     print(f"      Confidence: {(1 - result['confidence']):.1%}")
-    
+
     def demo_feedback(self):
         """Demo: Feedback system for continuous improvement"""
         print("\n" + "=" * 70)
         print("💬 FEEDBACK SYSTEM DEMO")
         print("=" * 70)
-        
+
         print("\n📝 Submitting feedback for false positive...")
-        
+
         # Example: Report a false positive
         response = requests.post(
             f"{self.base_url}/feedback",
@@ -255,47 +256,47 @@ class SecurityCopilotDemo:
                 "user_comment": "This was a real Amazon email"
             }
         )
-        
+
         if response.status_code == 200:
             result = response.json()
             print(f"   Status: {result['status']}")
             print(f"   {result['message']}")
             print("   ✅ Model will learn from this correction")
-    
+
     def show_statistics(self):
         """Show current system statistics"""
         print("\n" + "=" * 70)
         print("📊 SYSTEM STATISTICS")
         print("=" * 70)
-        
+
         response = requests.get(f"{self.base_url}/stats")
-        
+
         if response.status_code == 200:
             stats = response.json()
-            
+
             print(f"\n📈 Total Events Processed: {stats.get('total_events', 0)}")
-            
+
             if stats.get('by_source'):
                 print("\n📋 Events by Type:")
                 for source, count in stats['by_source'].items():
                     print(f"   - {source}: {count}")
-            
+
             if stats.get('threats_detected'):
                 print("\n⚠️ Threats Detected:")
                 for threat, count in stats['threats_detected'].items():
                     print(f"   - {threat}: {count}")
-    
+
     def run_all_demos(self):
         """Run all demonstrations"""
         if not self.check_server():
             return
-        
+
         self.demo_email_check()
         self.demo_url_check()
         self.demo_sms_check()
         self.demo_feedback()
         self.show_statistics()
-        
+
         print("\n" + "=" * 70)
         print("✅ DEMO COMPLETE!")
         print("=" * 70)
@@ -307,13 +308,14 @@ class SecurityCopilotDemo:
         print("\n🔗 API Documentation: http://localhost:8000/docs")
         print("📖 Usage Guide: REAL_WORLD_USAGE.md")
 
+
 def main():
     """Run the demo"""
     demo = SecurityCopilotDemo()
-    
+
     print("\n🤖 Starting Security Copilot Demo...")
     print("This will demonstrate real-world phishing detection scenarios.\n")
-    
+
     try:
         demo.run_all_demos()
     except KeyboardInterrupt:
@@ -321,6 +323,7 @@ def main():
     except Exception as e:
         print(f"\n❌ Error during demo: {e}")
         print("Make sure the server is running: python3 main_enhanced.py")
+
 
 if __name__ == "__main__":
     main()

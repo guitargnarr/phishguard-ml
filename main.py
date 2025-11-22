@@ -52,24 +52,30 @@ app.add_middleware(
 # ------------------------------------------------------------------ #
 # 3. Request / Response models
 # ------------------------------------------------------------------ #
+
+
 class ClassificationRequest(BaseModel):
     email_text: str
+
 
 class ClassificationResponse(BaseModel):
     classification: str
     confidence: float
     is_phishing: bool
 
+
 class CallLogRequest(BaseModel):
     phone_number: str
     timestamp: Optional[str] = None
     caller_name: Optional[str] = None
+
 
 class CallLogResponse(BaseModel):
     logged: bool
     phone_number: str
     timestamp: str
     risk_level: str
+
 
 # ------------------------------------------------------------------ #
 # 4. Unified security logger
@@ -78,15 +84,17 @@ LOG_DIR = Path("logs")
 LOG_DIR.mkdir(exist_ok=True)
 SECURITY_LOG = LOG_DIR / "security_log.csv"
 
+
 def init_security_log():
     """Initialize the security log with headers if it doesn't exist."""
     if not SECURITY_LOG.exists():
         with SECURITY_LOG.open("w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow([
-                "timestamp", "source", "content", 
+                "timestamp", "source", "content",
                 "classification", "confidence", "metadata"
             ])
+
 
 def log_security_event(
     source: str,  # "email" or "call"
@@ -108,12 +116,15 @@ def log_security_event(
             metadata
         ])
 
+
 # Initialize log on startup
 init_security_log()
 
 # ------------------------------------------------------------------ #
 # 5. Email classification endpoint
 # ------------------------------------------------------------------ #
+
+
 @app.post("/classify", response_model=ClassificationResponse)
 async def classify_email(req: ClassificationRequest):
     """Classify an email as phishing or legitimate."""
@@ -123,11 +134,11 @@ async def classify_email(req: ClassificationRequest):
     # Get prediction (0 or 1)
     prediction = clf.predict(vec.transform([req.email_text]))[0]
     proba = clf.predict_proba(vec.transform([req.email_text]))[0]
-    
+
     # Convert to string labels
     label = "phishing" if prediction == 1 else "legitimate"
     conf = float(proba[1] if prediction == 1 else proba[0])
-    
+
     # Log to unified security log
     log_security_event(
         source="email",
@@ -146,20 +157,22 @@ async def classify_email(req: ClassificationRequest):
 # ------------------------------------------------------------------ #
 # 6. Call logging endpoint
 # ------------------------------------------------------------------ #
+
+
 @app.post("/call_log", response_model=CallLogResponse)
 async def log_call(req: CallLogRequest):
     """Log an incoming call for security tracking."""
-    
+
     # Use provided timestamp or create one
     timestamp = req.timestamp or datetime.now().isoformat()
-    
+
     # Basic risk assessment based on common patterns
     risk_level = "unknown"
     risk_indicators = []
-    
+
     # Check for suspicious patterns
     phone = req.phone_number.replace("-", "").replace(" ", "").replace("(", "").replace(")", "")
-    
+
     # Common scam area codes and patterns
     if phone.startswith("900") or phone.startswith("976"):
         risk_indicators.append("premium_rate")
@@ -173,10 +186,10 @@ async def log_call(req: CallLogRequest):
     elif phone == "0000000000" or phone == "1111111111":
         risk_indicators.append("spoofed")
         risk_level = "high"
-    
+
     if not risk_indicators:
         risk_level = "low"
-    
+
     # Log to unified security log
     metadata = f"caller:{req.caller_name or 'unknown'}|indicators:{','.join(risk_indicators)}"
     log_security_event(
@@ -186,7 +199,7 @@ async def log_call(req: CallLogRequest):
         confidence=0.0,  # No ML confidence for calls yet
         metadata=metadata
     )
-    
+
     return CallLogResponse(
         logged=True,
         phone_number=req.phone_number,
@@ -197,6 +210,8 @@ async def log_call(req: CallLogRequest):
 # ------------------------------------------------------------------ #
 # 7. Health & stats endpoints
 # ------------------------------------------------------------------ #
+
+
 @app.get("/health")
 async def health_check():
     """Check if the API is healthy and models are loaded."""
@@ -206,20 +221,21 @@ async def health_check():
         "endpoints": ["/classify", "/call_log", "/stats"]
     }
 
+
 @app.get("/stats")
 async def get_stats():
     """Get basic statistics about logged security events."""
     if not SECURITY_LOG.exists():
         return {"total_events": 0}
-    
+
     with SECURITY_LOG.open("r") as f:
         reader = csv.DictReader(f)
         events = list(reader)
-    
+
     email_count = sum(1 for e in events if e["source"] == "email")
     call_count = sum(1 for e in events if e["source"] == "call")
     phishing_count = sum(1 for e in events if e["classification"] == "phishing")
-    
+
     return {
         "total_events": len(events),
         "email_events": email_count,
