@@ -24,9 +24,9 @@
 [Benchmarks](#-benchmarks) •
 [Contributing](#-contributing)
 
-![Demo](assets/demo.gif)
+<img src=".github/phishguard-hero.png" alt="PhishGuard - ML-Powered Phishing Detection" width="800">
 
-<sub>Built with ❤️ for cybersecurity professionals and developers</sub>
+<sub>Built for cybersecurity professionals and developers</sub>
 
 </div>
 
