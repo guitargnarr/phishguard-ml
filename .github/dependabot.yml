@@ -10,6 +10,9 @@ updates:
     ignore:
       # Pin scikit-learn to exact version - models trained with 1.6.1
       - dependency-name: "scikit-learn"
+      # xgboost 3.x requires Python >=3.10, project pinned to 3.9.6
+      - dependency-name: "xgboost"
+        versions: [">=3.0.0"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
