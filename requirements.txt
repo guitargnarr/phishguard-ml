@@ -13,7 +13,7 @@ python-multipart==0.0.20
 
 # Machine Learning Core (EXACT versions required for model compatibility)
 scikit-learn==1.6.1  # CRITICAL: Models trained with this version
-pandas>=2.0.0,<3.0.0  # Latest compatible with Python 3.9
+pandas>=2.0.0,<4.0.0  # Latest compatible with Python 3.9
 numpy>=1.24.0,<3.0.0
 joblib==1.5.3
 
