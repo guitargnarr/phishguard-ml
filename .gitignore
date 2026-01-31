@@ -13,6 +13,7 @@ __pycache__/
 
 # Runtime Logs
 logs/*.log
+logs/*.csv
 *.log
 test_server.log
 server_output.log
