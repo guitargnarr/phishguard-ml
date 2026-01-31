@@ -6,7 +6,7 @@
 # Models were trained with scikit-learn 1.6.1 - version must match
 
 # Core API Framework
-fastapi==0.118.0
+fastapi==0.128.0
 uvicorn==0.37.0
 pydantic==2.11.1
 python-multipart==0.0.20
