@@ -72,7 +72,7 @@ class URLAnalyzer:
 
         try:
             parsed = urllib.parse.urlparse(url)
-        except:
+        except (ValueError, TypeError):
             return {'error': 'Invalid URL format'}
 
         analysis = {
@@ -198,7 +198,7 @@ class URLAnalyzer:
         try:
             socket.inet_pton(socket.AF_INET6, domain)
             return True
-        except:
+        except (socket.error, OSError):
             pass
 
         return False
@@ -354,7 +354,7 @@ class URLAnalyzer:
             try:
                 with open(file_path, 'r') as f:
                     return json.load(f)
-            except:
+            except (json.JSONDecodeError, IOError):
                 pass
         return {}
 

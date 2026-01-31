@@ -136,7 +136,7 @@ class GmailPhishingDetector:
                     payload['body']['data'] + '===='
                 ).decode('utf-8', errors='ignore')
                 body += decoded
-            except:
+            except (ValueError, UnicodeDecodeError):
                 pass
 
         # Check parts recursively
@@ -330,7 +330,7 @@ def main():
         else:
             print("❌ Security Copilot API not responding")
             return
-    except:
+    except (requests.ConnectionError, requests.Timeout):
         print("❌ Security Copilot API not available at http://localhost:8000")
         print("   Start it with: python3 main_enhanced.py")
         return

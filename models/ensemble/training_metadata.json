@@ -1,21 +1,23 @@
 {
-  "training_date": "2025-10-20T18:12:05.837125",
-  "version": "2.0_comprehensive",
-  "n_training_samples": 4000,
-  "n_test_samples": 1000,
-  "n_features": 2039,
-  "template_categories": {
-    "modern_tactics": 8,
-    "sophisticated_techniques": 6,
-    "language_diversity": 2,
-    "real_world_noise": 3
-  },
-  "total_templates": "150+",
+  "training_date": "2026-01-31T17:27:10.700226",
+  "n_training_samples": 1600,
+  "n_test_samples": 400,
+  "n_features": 843,
   "test_metrics": {
     "accuracy": 1.0,
     "precision": 1.0,
     "recall": 1.0,
     "f1": 1.0,
-    "auc": 1.0
+    "auc": 1.0,
+    "confusion_matrix": {
+      "true_negatives": 200,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "true_positives": 200
+    }
+  },
+  "feature_composition": {
+    "tfidf_features": 804,
+    "advanced_features": 39
   }
 }

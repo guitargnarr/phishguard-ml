@@ -82,7 +82,7 @@ That's it! 🎉 The API is now running on `http://localhost:8000`
 ### 🔬 Advanced ML Detection
 - **Dual-mode system**: Simple (fast) or Ensemble (accurate)
 - **Simple mode**: 646 TF-IDF features, Random Forest
-- **Ensemble mode**: 2,039 features (2,000 TF-IDF + 39 advanced), 7 models
+- **Ensemble mode**: TF-IDF + 39 advanced features, 7-model voting ensemble
 - **150+ phishing patterns** covering modern attack vectors
 - **100% test accuracy** on comprehensive dataset
 - **Probability-based scoring** with calibrated confidence
@@ -149,7 +149,7 @@ PhishGuard ML offers two deployment modes, allowing you to choose between speed 
 **Optimized for maximum accuracy on critical decisions**
 
 - **Speed**: ~100ms per request
-- **Features**: 2,039 features (2,000 TF-IDF + 39 advanced engineered features)
+- **Features**: TF-IDF (up to 1,000) + 39 advanced engineered features
 - **Models**: 7-model ensemble (Random Forest, XGBoost, LightGBM, SVM, MLP, Logistic Regression, Gradient Boosting)
 - **Size**: 101 MB on disk
 - **Best for**: Critical security decisions, batch processing, compliance reporting
@@ -210,24 +210,37 @@ curl -X POST http://localhost:8000/classify_detailed?mode=ensemble \
 git clone https://github.com/guitargnarr/phishguard-ml.git
 cd phishguard-ml
 
-# The repository includes a configured virtual environment
-# Just run the server
-./run.sh
+# Install dependencies
+pip install -r requirements.txt
+
+# Train the ensemble model (generates ~21 MB pickle, excluded from git)
+python train_ensemble.py
+
+# Start the server
+python main_production.py
 ```
 
 ### Option 2: Fresh Installation
 
 ```bash
-# Create virtual environment
+# Create virtual environment (Python 3.9 required for model compatibility)
 python3.9 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 
+# Train the ensemble model (required - not included in repo due to size)
+python train_ensemble.py
+
 # Start the server
-python main.py
+python main_production.py
 ```
+
+> **Note**: The ensemble model pickle (~21 MB) is excluded from git via `.gitignore`.
+> You must run `python train_ensemble.py` after cloning to generate
+> `models/ensemble/ensemble_model.pkl`. The simple model works immediately
+> without this step, but ensemble mode requires it.
 
 ### Option 3: Docker
 
@@ -322,7 +335,7 @@ Content-Type: application/json
   },
   "model_info": {
     "models": ["RandomForest", "XGBoost", "LightGBM", "SVM", "MLP", "LogisticRegression", "GradientBoosting"],
-    "features": 2039
+    "features": 843
   },
   "individual_votes": {
     "RandomForest": "phishing",
@@ -374,7 +387,7 @@ GET /stats
                            │              ┌─────────────────┐
                            │              │ Feature         │
                            │              │ Engineering     │
-                           │              │ (2,039 features)│
+                           │              │ (TF-IDF + 39)   │
                            │              └─────────────────┘
                            │                       │
                            ▼                       ▼
@@ -455,9 +468,9 @@ GET /stats
 
 </details>
 
-### Feature Engineering (2,039 features)
+### Feature Engineering (TF-IDF + 39 advanced)
 
-- **2,000 TF-IDF features**: N-grams (1-3), term frequency-inverse document frequency
+- **TF-IDF features** (up to 1,000): N-grams (1-3), term frequency-inverse document frequency
 - **39 Advanced features**:
   - Email metadata (length, structure)
   - URL patterns (shorteners, suspicious TLDs, IP addresses)
