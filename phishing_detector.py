@@ -3,6 +3,7 @@
 """
 PhishingDetector - Unified detector supporting both simple and ensemble models
 """
+import warnings
 import joblib
 import numpy as np
 from pathlib import Path
@@ -195,14 +196,22 @@ class PhishingDetector:
         else:  # ensemble
             features = self._extract_features_ensemble(text)
 
-        # Predict
-        prediction = self.model.predict(features)[0]
-        proba = self.model.predict_proba(features)[0]
+        # Predict (suppress LGBMClassifier feature name warnings -- the ensemble
+        # contains models trained with and without feature names, but the feature
+        # dimensions are validated above so the warning is harmless)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="X does not have valid feature names",
+                category=UserWarning,
+            )
+            prediction = self.model.predict(features)[0]
+            proba = self.model.predict_proba(features)[0]
 
         # Format response
         classification = "phishing" if prediction == 1 else "legitimate"
         confidence = float(proba[prediction])
-        is_phishing = (prediction == 1)
+        is_phishing = bool(prediction == 1)
 
         return classification, confidence, is_phishing
 
@@ -232,32 +241,38 @@ class PhishingDetector:
         else:
             features = self._extract_features_ensemble(text)
 
-        proba = self.model.predict_proba(features)[0]
-        result['probabilities'] = {
-            'legitimate': float(proba[0]),
-            'phishing': float(proba[1])
-        }
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="X does not have valid feature names",
+                category=UserWarning,
+            )
+            proba = self.model.predict_proba(features)[0]
+            result['probabilities'] = {
+                'legitimate': float(proba[0]),
+                'phishing': float(proba[1])
+            }
 
-        # For ensemble mode, can add individual model votes
-        if self.mode == 'ensemble':
-            # Get individual model predictions if available
-            # This requires accessing the ensemble's estimators
-            try:
-                individual_predictions = {}
-                for name, estimator in self.model.calibrated_classifiers_[0].estimator.named_estimators_.items():
-                    pred = estimator.predict(features)[0]
-                    individual_predictions[name] = "phishing" if pred == 1 else "legitimate"
+            # For ensemble mode, can add individual model votes
+            if self.mode == 'ensemble':
+                # Get individual model predictions if available
+                # This requires accessing the ensemble's estimators
+                try:
+                    individual_predictions = {}
+                    for name, estimator in self.model.calibrated_classifiers_[0].estimator.named_estimators_.items():
+                        pred = estimator.predict(features)[0]
+                        individual_predictions[name] = "phishing" if pred == 1 else "legitimate"
 
-                result['individual_votes'] = individual_predictions
+                    result['individual_votes'] = individual_predictions
 
-                # Calculate agreement
-                votes = list(individual_predictions.values())
-                phishing_votes = votes.count('phishing')
-                total_votes = len(votes)
-                result['agreement_rate'] = phishing_votes / total_votes if classification == 'phishing' else (total_votes - phishing_votes) / total_votes
+                    # Calculate agreement
+                    votes = list(individual_predictions.values())
+                    phishing_votes = votes.count('phishing')
+                    total_votes = len(votes)
+                    result['agreement_rate'] = phishing_votes / total_votes if classification == 'phishing' else (total_votes - phishing_votes) / total_votes
 
-            except Exception as e:
-                logger.debug(f"Could not extract individual votes: {e}")
+                except Exception as e:
+                    logger.debug(f"Could not extract individual votes: {e}")
 
         return result
 
