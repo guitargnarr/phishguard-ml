@@ -13,6 +13,9 @@ updates:
       # xgboost 3.x requires Python >=3.10, project pinned to 3.9.6
       - dependency-name: "xgboost"
         versions: [">=3.0.0"]
+      # imbalanced-learn 0.13+ requires Python >=3.10
+      - dependency-name: "imbalanced-learn"
+        versions: [">=0.13.0"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
