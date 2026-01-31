@@ -32,7 +32,7 @@ class SecurityCopilotDemo:
             if response.status_code == 200:
                 print("✅ Server is running")
                 return True
-        except:
+        except (requests.ConnectionError, requests.Timeout):
             print("❌ Server not responding. Start with: python3 main_enhanced.py")
             return False
         return False

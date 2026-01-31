@@ -4,12 +4,15 @@
 Ensemble Model System for Advanced Phishing Detection
 Combines multiple ML algorithms for superior accuracy
 """
+import logging
 import numpy as np
 import pandas as pd
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Optional
 import joblib
 from pathlib import Path
 import json
+
+logger = logging.getLogger(__name__)
 
 from sklearn.ensemble import (
     RandomForestClassifier,
@@ -22,7 +25,7 @@ from sklearn.svm import SVC
 from sklearn.neural_network import MLPClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.calibration import CalibratedClassifierCV
-from sklearn.model_selection import cross_val_score, StratifiedKFold
+from sklearn.model_selection import cross_val_score
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score,
     f1_score, roc_auc_score, confusion_matrix
@@ -292,8 +295,8 @@ class EnsemblePhishingDetector:
                 proba = model.predict_proba(X)[:, 1]
                 individual_predictions[name] = pred
                 individual_probabilities[name] = proba
-            except:
-                pass
+            except (ValueError, AttributeError, NotImplementedError) as e:
+                logger.warning(f"Could not get prediction from {name}: {e}")
 
         # Get ensemble prediction
         ensemble_pred = self.predict(X)
@@ -374,7 +377,7 @@ class EnsemblePhishingDetector:
         print(f"  🎯 F1 Score: {metrics['f1']:.4f}")
         print(f"  🎯 AUC-ROC: {metrics['auc']:.4f}")
 
-        print(f"\n  📊 Confusion Matrix:")
+        print("\n  📊 Confusion Matrix:")
         print(f"     True Negatives: {metrics['confusion_matrix']['true_negatives']}")
         print(f"     False Positives: {metrics['confusion_matrix']['false_positives']}")
         print(f"     False Negatives: {metrics['confusion_matrix']['false_negatives']}")
@@ -466,7 +469,7 @@ def create_and_train_ensemble(X_train, y_train, X_val, y_val,
     ensemble_detector.train_ensemble(X_train, y_train)
 
     # Evaluate on validation set
-    metrics = ensemble_detector.evaluate_ensemble(X_val, y_val)
+    ensemble_detector.evaluate_ensemble(X_val, y_val)
 
     # Get feature importance
     if feature_names:

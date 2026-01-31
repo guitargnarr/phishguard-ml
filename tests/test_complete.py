@@ -177,8 +177,8 @@ class TestFeatures:
         assert 'capital_ratio' in features
         assert features['length'] == len(text)
 
-    def test_feature_combination_2039(self):
-        """Test ensemble feature combination produces 2039 features."""
+    def test_feature_combination(self):
+        """Test ensemble feature combination produces correct number of features."""
         try:
             detector = load_ensemble_detector()
         except FileNotFoundError:
@@ -187,7 +187,8 @@ class TestFeatures:
         text = "Test email"
         features = detector._extract_features_ensemble(text)
 
-        assert features.shape[1] == 2039, f"Expected 2039 combined features, got {features.shape[1]}"
+        expected = detector.scaler.n_features_in_
+        assert features.shape[1] == expected, f"Expected {expected} combined features, got {features.shape[1]}"
 
     def test_feature_scaling(self):
         """Test feature scaling doesn't change shape."""
@@ -200,7 +201,8 @@ class TestFeatures:
         features = detector._extract_features_ensemble(text)
 
         # Features should be scaled but same shape
-        assert features.shape[1] == 2039
+        expected = detector.scaler.n_features_in_
+        assert features.shape[1] == expected
         assert isinstance(features, np.ndarray)
 
     def test_feature_order_preserved(self):
@@ -458,7 +460,8 @@ class TestIntegration:
 
         # Extract features
         features = detector._extract_features_ensemble(text)
-        assert features.shape[1] == 2039
+        expected = detector.scaler.n_features_in_
+        assert features.shape[1] == expected
 
         # Predict
         classification, confidence, is_phishing = detector.predict(text)

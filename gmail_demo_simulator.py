@@ -306,7 +306,7 @@ def main():
             print("✅ Security API is running\n")
         else:
             print("⚠️  Security API issue detected")
-    except:
+    except (requests.ConnectionError, requests.Timeout):
         print("❌ Security API not available. Start with: python3 main_enhanced.py")
         return
 

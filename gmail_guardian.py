@@ -109,19 +109,19 @@ class GmailSecurityGuardian:
                 if content_type == "text/plain" and "attachment" not in content_disposition:
                     try:
                         body = part.get_payload(decode=True).decode()
-                    except:
+                    except (UnicodeDecodeError, AttributeError):
                         pass
                 elif content_type == "text/html" and not body:
                     try:
                         html_body = part.get_payload(decode=True).decode()
                         # Simple HTML to text
                         body = re.sub('<[^<]+?>', '', html_body)
-                    except:
+                    except (UnicodeDecodeError, AttributeError):
                         pass
         else:
             try:
                 body = msg.get_payload(decode=True).decode()
-            except:
+            except (UnicodeDecodeError, AttributeError):
                 body = str(msg.get_payload())
 
         return body[:5000]  # Limit to 5000 chars
@@ -332,16 +332,16 @@ class GmailSecurityGuardian:
                 self.imap.store(email_id, '+FLAGS', '\\Deleted')
                 self.imap.expunge()
                 print("   ✅ Email deleted")
-            except:
-                print("   ⚠️  Could not delete email")
+            except Exception as e:
+                print(f"   ⚠️  Could not delete email: {e}")
         else:
             # Medium confidence - flag it
             print("   Action: Flagging as suspicious")
             try:
                 self.imap.store(email_id, '+FLAGS', '\\Flagged')
                 print("   ✅ Email flagged")
-            except:
-                print("   ⚠️  Could not flag email")
+            except Exception as e:
+                print(f"   ⚠️  Could not flag email: {e}")
 
         # Log the action
         analysis['action_taken'] = 'deleted' if analysis['confidence'] > 0.8 else 'flagged'
@@ -408,7 +408,7 @@ def main():
                 print("✅ Security API is running")
             else:
                 print("⚠️  Security API returned status:", response.status_code)
-        except:
+        except (requests.ConnectionError, requests.Timeout):
             print("❌ Security API not available. Start with: python3 main_enhanced.py")
             print("Continuing anyway...")
 

@@ -21,8 +21,8 @@ class PhishingDetector:
     Unified phishing detection system supporting both simple and ensemble modes.
 
     Modes:
-        - simple: Fast Random Forest (33 KB, <20ms, 2000 features)
-        - ensemble: Accurate 7-model ensemble (101 MB, ~100ms, 2039 features)
+        - simple: Fast Random Forest (33 KB, <20ms)
+        - ensemble: Accurate 7-model ensemble (~100ms, TF-IDF + 39 advanced features)
     """
 
     def __init__(self, mode: str = 'simple', models_dir: str = 'models'):
@@ -119,12 +119,12 @@ class PhishingDetector:
 
             # Metadata
             performance = ensemble_data.get('performance_metrics', {})
+            n_features = self.scaler.n_features_in_
             self.model_info = {
                 'mode': 'ensemble',
                 'type': 'VotingClassifier (7 models)',
                 'models': ['RandomForest', 'XGBoost', 'LightGBM', 'SVM', 'MLP', 'LogisticRegression', 'GradientBoosting'],
-                'features': 2039,
-                'size_mb': 101.2,
+                'features': n_features,
                 'speed_ms': 100,
                 'performance': performance
             }
@@ -146,22 +146,23 @@ class PhishingDetector:
         Extract features for ensemble model (TF-IDF + Advanced).
 
         Returns:
-            np.ndarray: Shape (1, 2039) - 2000 TF-IDF + 39 advanced features
+            np.ndarray: Scaled feature array matching the trained model's dimensions
         """
-        # TF-IDF features (2000)
+        # TF-IDF features
         tfidf_features = self.vectorizer.transform([text]).toarray()
 
         # Advanced features (39)
         advanced_features_dict = self.feature_extractor.extract_all_features(text)
         advanced_features_array = np.array(list(advanced_features_dict.values())).reshape(1, -1)
 
-        # Combine (2039 total)
+        # Combine
         combined_features = np.hstack([tfidf_features, advanced_features_array])
 
-        # Verify dimension
-        if combined_features.shape[1] != 2039:
+        # Verify dimension matches scaler expectations
+        expected_features = self.scaler.n_features_in_
+        if combined_features.shape[1] != expected_features:
             raise ValueError(
-                f"Feature dimension mismatch! Expected 2039, got {combined_features.shape[1]}"
+                f"Feature dimension mismatch! Expected {expected_features}, got {combined_features.shape[1]}"
             )
 
         # Scale
