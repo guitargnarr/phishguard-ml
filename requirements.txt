@@ -20,7 +20,7 @@ joblib==1.5.3
 # Enhanced ML Models
 xgboost==2.1.4
 lightgbm==4.6.0
-imbalanced-learn==0.12.4  # Latest compatible with Python 3.9
+imbalanced-learn==0.14.1  # Latest compatible with Python 3.9
 
 # Feature Extraction
 validators==0.35.0
